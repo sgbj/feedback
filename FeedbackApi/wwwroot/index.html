@@ -1,0 +1,284 @@
+﻿<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+  <title>Feedback</title>
+</head>
+
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container d-flex">
+      <a class="navbar-brand" href="#">Feedback</a>
+      <span class="flex-grow-1"></span>
+      <button type="button" class="btn btn-outline-light" data-bs-toggle="modal"
+        data-bs-target="#submitFeedbackModal">Submit feedback</button>
+    </div>
+  </nav>
+
+  <main class="container my-3">
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Rating</th>
+          <th>Message</th>
+          <th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody id="feedbacksTableBody">
+      </tbody>
+    </table>
+  </main>
+
+  <div class="modal fade" id="submitFeedbackModal" tabindex="-1" aria-labelledby="submitFeedbackModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="submitFeedbackModalLabel">Submit feedback</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <div class="mb-3">Rating</div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="ratingRadio" id="ratingRadio1" value="1">
+              <label class="form-check-label" for="ratingRadio1">1</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="ratingRadio" id="ratingRadio2" value="2">
+              <label class="form-check-label" for="ratingRadio2">2</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="ratingRadio" id="ratingRadio3" value="3">
+              <label class="form-check-label" for="ratingRadio3">3</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="ratingRadio" id="ratingRadio4" value="4">
+              <label class="form-check-label" for="ratingRadio4">4</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="ratingRadio" id="ratingRadio5" value="5" checked>
+              <label class="form-check-label" for="ratingRadio5">5</label>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="messageTextarea" class="form-label">Message</label>
+            <textarea class="form-control" id="messageTextarea" rows="3"></textarea>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="includeScreenshotSwitchCheck" checked>
+            <label class="form-check-label" for="includeScreenshotSwitchCheck">Include screenshot</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button id="submitFeedbackButton" type="button" class="btn btn-primary"
+            data-bs-dismiss="modal">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="feedbackDetailsModal" tabindex="-1" aria-labelledby="feedbackDetailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="feedbackDetailsModalLabel">Feedback details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <table class="table table-borderless">
+            <tbody>
+              <tr>
+                <th scope="row">ID</th>
+                <td id="idCell"></td>
+              </tr>
+              <tr>
+                <th scope="row">Rating</th>
+                <td id="ratingCell"></td>
+              </tr>
+              <tr>
+                <th scope="row">Message</th>
+                <td id="messageCell"></td>
+              </tr>
+              <tr>
+                <th scope="row">User agent</th>
+                <td id="userAgentCell"></td>
+              </tr>
+              <tr>
+                <th scope="row">Submitted</th>
+                <td id="submittedCell"></td>
+              </tr>
+              <tr>
+                <th scope="row">Attachments</th>
+                <td id="attachmentsCell"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button id="deleteFeedbackButton" type="button" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+    crossorigin="anonymous"></script>
+
+  <script>
+    loadTable();
+
+    document.getElementById('submitFeedbackButton').addEventListener('click', () => {
+      const rating = document.querySelector('input[name=ratingRadio]:checked').value;
+      const message = document.getElementById('messageTextarea').value;
+      const includeScreenshot = document.getElementById('includeScreenshotSwitchCheck').checked;
+
+      const feedback = {
+        rating,
+        message,
+        userAgent: navigator.userAgent
+      };
+
+      if (includeScreenshot) {
+        getScreenshot().then(dataUrl => {
+          const matches = dataUrl.match(/^data:(.*);base64,(.*)$/);
+          const mediaType = matches[1];
+          const data = matches[2];
+
+          feedback.attachments = [{ mediaType, data }];
+
+          postFeedback(feedback).then(loadTable);
+        });
+      } else {
+        postFeedback(feedback).then(loadTable);
+      }
+    });
+
+    document.getElementById('deleteFeedbackButton').addEventListener('click', () => {
+      const id = document.getElementById('idCell').innerText;
+
+      deleteFeedback(id).then(loadTable);
+    });
+
+    async function loadTable() {
+      const feedbacks = await getFeedbacks();
+
+      const rows = feedbacks.map(feedback => {
+        const row = document.createElement('tr');
+        row.setAttribute('data-bs-toggle', 'modal');
+        row.setAttribute('data-bs-target', '#feedbackDetailsModal');
+
+        row.addEventListener('click', () => {
+          loadFeedback(feedback.id);
+        });
+
+        const id = document.createElement('td');
+        id.innerText = feedback.id;
+
+        const rating = document.createElement('td');
+        rating.innerText = feedback.rating;
+
+        const message = document.createElement('td');
+        message.innerText = feedback.message;
+
+        const submitted = document.createElement('td');
+        submitted.innerText = new Date(feedback.submitted).toLocaleString();
+
+        row.append(id, rating, message, submitted);
+        return row;
+      });
+
+      document.getElementById('feedbacksTableBody').replaceChildren(...rows);
+    }
+
+    async function loadFeedback(id) {
+      const feedback = await getFeedback(id);
+
+      document.getElementById('idCell').innerText = feedback.id;
+      document.getElementById('ratingCell').innerText = feedback.rating;
+      document.getElementById('messageCell').innerText = feedback.message;
+      document.getElementById('userAgentCell').innerText = feedback.userAgent;
+      document.getElementById('submittedCell').innerText = new Date(feedback.submitted).toLocaleString();
+
+      const images = feedback.attachments.map(attachment => {
+        const image = document.createElement('img');
+        image.src = `data:${attachment.mediaType};base64,${attachment.data}`;
+        image.classList.add('w-100');
+        return image;
+      });
+
+      document.getElementById('attachmentsCell').replaceChildren(...images);
+    }
+
+    async function getFeedbacks() {
+      const response = await fetch('/feedbacks');
+      return response.json();
+    }
+
+    async function getFeedback(id) {
+      const response = await fetch(`/feedbacks/${id}`);
+      return response.json();
+    }
+
+    async function postFeedback(feedback) {
+      const response = await fetch('/feedbacks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(feedback)
+      });
+      return response.json();
+    }
+
+    async function deleteFeedback(id) {
+      return fetch(`/feedbacks/${id}`, {
+        method: 'DELETE'
+      });
+    }
+
+    async function getScreenshot() {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: {
+          cursor: 'always'
+        }
+      });
+
+      return new Promise((resolve, reject) => {
+        const video = document.createElement('video');
+        video.srcObject = stream;
+
+        video.addEventListener('canplay', () => {
+          setTimeout(() => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0);
+
+            const tracks = video.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+            video.srcObject = null;
+
+            const dataUrl = canvas.toDataURL();
+            resolve(dataUrl);
+          }, 1000);
+        });
+
+        video.play();
+      });
+    }
+  </script>
+</body>
+
+</html>
